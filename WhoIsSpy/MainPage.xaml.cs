@@ -49,6 +49,7 @@ namespace WhoIsSpy
                    "/start - начать игру\n" +
                    "/stop - закончить игру\n" +
                    "/locations - получить список локаций\n" +
+                   "/run - запуск игры, распределение ролей" + 
                    namesAndId;
         }
         
@@ -118,6 +119,12 @@ namespace WhoIsSpy
                 {
                     await Bot.SendTextMessageAsync(message.Chat.Id, GetLocations());
                 }
+                else if(message.Text == "/run")
+                {
+                    await Bot.SendTextMessageAsync(message.Chat.Id, "Игра началась",
+                        replyToMessageId: message.MessageId);
+                    SendMessageAboutRole();
+                }
             }
         }
 
@@ -158,7 +165,7 @@ namespace WhoIsSpy
             }
         }
 
-        private async void StartGame_OnClick(object sender, RoutedEventArgs e)
+        public async void SendMessageAboutRole()
         {
             if (Bot != null)
             {
@@ -169,16 +176,19 @@ namespace WhoIsSpy
                 string location = ListLocation.Instance.GetRandomLocation();
                 foreach (var id in hashSet)
                 {
+                    string message = "";
                     try
                     {
+                        message += "********************";
                         if (i == indexSpy)
-                            await Bot.SendTextMessageAsync(id, "Ты Шпион");
+                            message += "\nТы Шпион";
                         else
-                            await Bot.SendTextMessageAsync(id, "Локация : " + location);
+                            message += "\nЛокация : " + location;
                         if (i == imdexStartStep)
                         {
-                            await Bot.SendTextMessageAsync(id, "Твой ход первый");
+                            message += "\nТвой ход первый";
                         }
+                        await Bot.SendTextMessageAsync(id, message);
                     }
                     catch (Exception exception)
                     {
@@ -187,6 +197,12 @@ namespace WhoIsSpy
                     i++;
                 }
             }
+
+        }
+
+        private async void StartGame_OnClick(object sender, RoutedEventArgs e)
+        {
+            SendMessageAboutRole();
         }
 
         private void AddFile_OnClick(object sender, RoutedEventArgs e)
