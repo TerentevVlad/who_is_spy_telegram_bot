@@ -1,0 +1,61 @@
+﻿<Page
+    x:Class="WhoIsSpy.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WhoIsSpy"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <StackPanel
+            Margin="100">
+            <StackPanel
+                Orientation="Horizontal">
+                <Button
+                    Margin="18"
+                    Name="ConnectToTelegram"
+                    Width="100"
+                    Height="50"
+                    Content="Connect"
+                    Click="ConnectToTelegram_OnClick"/>
+                <Button
+                    Margin="18"
+                    Name="AddFile"
+                    Width="100"
+                    Height="50"
+                    Content="Add File"
+                    Click="AddFile_OnClick"/>
+                <Button
+                    Margin="18"
+                    Name="StartGame"
+                    Width="100"
+                    Height="50"
+                    Content="Start"
+                    Click="StartGame_OnClick"/>
+            </StackPanel>
+            <StackPanel
+                Orientation="Horizontal">
+                <ListBox
+                    x:Name="ListId"
+                    Width="372"
+                    Height="500"
+                    Margin="18">
+                </ListBox>
+            </StackPanel>
+            <StackPanel
+                Orientation="Horizontal">
+                <TextBox 
+                    Name="textBlockKey"
+                    Margin="18"
+                    Width="372"
+                    Height="50"/>
+            </StackPanel>
+            
+            
+            
+        </StackPanel>
+        
+    </Grid>
+</Page>
