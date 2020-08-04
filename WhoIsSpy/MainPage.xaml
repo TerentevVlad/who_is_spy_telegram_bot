@@ -52,9 +52,14 @@
                     Width="372"
                     Height="50"/>
             </StackPanel>
-            
-            
-            
+            <StackPanel
+                Orientation="Horizontal">
+                <TextBox 
+                    Name="textBlockId"
+                    Margin="18"
+                    Width="372"
+                    Height="50"/>
+            </StackPanel>
         </StackPanel>
         
     </Grid>

@@ -37,6 +37,7 @@ namespace WhoIsSpy
             this.InitializeComponent();
 
             textBlockKey.Text = Preferences.GetString("key", "Введите токен бота");
+            textBlockId.Text = Preferences.GetString("id", "0");
             hashSet = new HashSet<long>();
             
         }
@@ -49,7 +50,7 @@ namespace WhoIsSpy
                    "/start - начать игру\n" +
                    "/stop - закончить игру\n" +
                    "/locations - получить список локаций\n" +
-                   "/run - запуск игры, распределение ролей" + 
+                   "/run - запуск игры, распределение ролей\n" + 
                    namesAndId;
         }
         
@@ -103,7 +104,6 @@ namespace WhoIsSpy
                 {
                     await Bot.SendTextMessageAsync(message.Chat.Id, TextHelp(message),
                         replyToMessageId: message.MessageId);
-
                 }
                 else if (message.Text == "/start")
                 {
@@ -121,9 +121,14 @@ namespace WhoIsSpy
                 }
                 else if(message.Text == "/run")
                 {
-                    await Bot.SendTextMessageAsync(message.Chat.Id, "Игра началась",
-                        replyToMessageId: message.MessageId);
-                    SendMessageAboutRole();
+                    if (message.Chat.Id.ToString() == textBlockId.Text)
+                    {
+
+
+                        await Bot.SendTextMessageAsync(message.Chat.Id, "Игра началась",
+                            replyToMessageId: message.MessageId);
+                        SendMessageAboutRole();
+                    }
                 }
             }
         }
@@ -151,14 +156,16 @@ namespace WhoIsSpy
             {
                 Console.WriteLine(exception);
             }
-
         }
 
         private void ConnectToTelegram_OnClick(object sender, RoutedEventArgs e)
         {
 
             var text = textBlockKey.Text;
+            var id = textBlockId.Text;
             Preferences.SaveString("key", text);
+            Preferences.SaveString("id", id);
+            
             if (Bot == null)
             {
                 BwDoWork(text);

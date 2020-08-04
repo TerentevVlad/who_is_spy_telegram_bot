@@ -24,5 +24,6 @@ namespace WhoIsSpy
             ApplicationDataContainer localSettings = Windows.Storage.ApplicationData.Current.LocalSettings;
             localSettings.Values[key] = value;
         }
+
     }
 }
