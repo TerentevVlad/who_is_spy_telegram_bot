@@ -11,7 +11,7 @@ namespace WhoIsSpy.Data
     class ListLocation
     {
         private static ListLocation instance;
-        private List<String> locations = new List<string>();
+        public List<String> locations { get; private set; } = new List<string>();
         public static ListLocation Instance
         {
             get { return instance ?? (instance = new ListLocation()); }

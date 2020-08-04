@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -29,13 +30,13 @@ namespace WhoIsSpy
     public sealed partial class MainPage : Page
     {
         private TelegramBotClient Bot;
-        private string Key = "Введите токен бота";
         private HashSet<long> hashSet;
 
         public MainPage()
         {
             this.InitializeComponent();
-            textBlockKey.Text = Key;
+
+            textBlockKey.Text = Preferences.GetString("key", "Введите токен бота");
             hashSet = new HashSet<long>();
             
         }
@@ -44,10 +45,13 @@ namespace WhoIsSpy
         {
             string namesAndId = message.From.FirstName + " id:" + message.From.Id;
 
-            return "/start - начать игру\n" +
+            return "/help - получить помощь по командам бота\n" +
+                   "/start - начать игру\n" +
                    "/stop - закончить игру\n" +
+                   "/locations - получить список локаций\n" +
                    namesAndId;
         }
+        
 
         private void SaveId(int id)
         {
@@ -72,12 +76,28 @@ namespace WhoIsSpy
             }
         }
 
+        private string GetLocations()
+        {
+            string listLocations = "Нет никаких локаций";
+            
+
+            var list = ListLocation.Instance.locations;
+            if (list.Count > 0)
+            {
+                listLocations = "";
+                foreach (var item in list)
+                {
+                    listLocations += item + "\n";
+                }
+            }
+
+            return listLocations;
+        }
+
         private async void ReadMessage(Message message)
         {
             if (message.Type == MessageType.Text)
             {
-               
-                var userId = message.Chat.Id;
                 if (message.Text == "/help")
                 {
                     await Bot.SendTextMessageAsync(message.Chat.Id, TextHelp(message),
@@ -86,13 +106,17 @@ namespace WhoIsSpy
                 }
                 else if (message.Text == "/start")
                 {
-                    await Bot.SendTextMessageAsync(message.Chat.Id, "Ожидайте других игроков и напомните одмену, что пора бы начать\n /help - для получения помощи");
+                    await Bot.SendTextMessageAsync(message.Chat.Id, "Ожидайте других игроков и напомните одмену, что пора бы начать\n /help - для получения списка доступных команд");
                     SaveId(message.From.Id);
                 }
                 else if(message.Text == "/stop")
                 {
                     await Bot.SendTextMessageAsync(message.Chat.Id, "Вы завершили игру");
                     RemoveId(message.Chat.Id);
+                }
+                else if (message.Text == "/locations")
+                {
+                    await Bot.SendTextMessageAsync(message.Chat.Id, GetLocations());
                 }
             }
         }
@@ -125,7 +149,9 @@ namespace WhoIsSpy
 
         private void ConnectToTelegram_OnClick(object sender, RoutedEventArgs e)
         {
+
             var text = textBlockKey.Text;
+            Preferences.SaveString("key", text);
             if (Bot == null)
             {
                 BwDoWork(text);
