@@ -19,6 +19,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using WhoIsSpy.Data;
+using System.Timers;
 
 // Документацию по шаблону элемента "Пустая страница" см. по адресу https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x419
 
@@ -31,6 +32,7 @@ namespace WhoIsSpy
     {
         private TelegramBotClient Bot;
         private HashSet<long> hashSet;
+        private DispatcherTimer timer;
 
         public MainPage()
         {
@@ -50,7 +52,7 @@ namespace WhoIsSpy
                    "/start - начать игру\n" +
                    "/stop - закончить игру\n" +
                    "/locations - получить список локаций\n" +
-                   "/run - запуск игры, распределение ролей\n" + 
+                   "/run:5 - запуск игры, распределение ролей. Через : указывается время игры в минутах. Если ничего не указать по умолчанию будет 10 минут\n" + 
                    namesAndId;
         }
         
@@ -119,18 +121,58 @@ namespace WhoIsSpy
                 {
                     await Bot.SendTextMessageAsync(message.Chat.Id, GetLocations());
                 }
-                else if(message.Text == "/run")
+                else if(message.Text.StartsWith("/run"))
                 {
                     if (message.Chat.Id.ToString() == textBlockId.Text)
                     {
-
-
+                        var messageWithOptions = message.Text.Split(':');
+                        int minutes = 10;
+                        if (messageWithOptions.Length == 2)
+                        {
+                            try
+                            {
+                                minutes = Convert.ToInt32(messageWithOptions[1]);
+                                minutes = Math.Abs(minutes);
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                        }
+                        if (timer != null) timer.Stop();
+                        timer = new DispatcherTimer() 
+                        { 
+                            Interval = new TimeSpan(0, minutes, 0)
+                        };
+                        timer.Tick += Timer_Tick;
+                        timer.Start();
                         await Bot.SendTextMessageAsync(message.Chat.Id, "Игра началась",
                             replyToMessageId: message.MessageId);
                         SendMessageAboutRole();
                     }
                 }
             }
+        }
+
+        private async void Timer_Tick(object sender, object e)
+        {
+            if (Bot != null)
+            {
+                foreach (var id in hashSet)
+                {
+                    try
+                    {
+                        string message = "Время вышло";
+                        await Bot.SendTextMessageAsync(id, message);
+                    }
+                    catch (Exception exc)
+                    {
+                        Console.WriteLine(exc.Message);
+                    }
+
+                }
+            }
+            timer.Stop();
         }
 
         private async void BwDoWork(string key)
